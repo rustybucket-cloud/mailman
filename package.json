@@ -1,6 +1,7 @@
 {
   "name": "mailman",
   "version": "0.1.0",
+  "private": true,
   "description": "Drafts app release notes with Claude Code from your GitHub history, then delivers them as a pull request for approval.",
   "main": "./out/main/index.js",
   "author": "Jacob Patton",

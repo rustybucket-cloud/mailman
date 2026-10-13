@@ -85,6 +85,8 @@ function registerIpc(): void {
 
 app.whenReady().then(async () => {
   await adoptLoginShellPath()
+  // Packaged builds get the icon from electron-builder; in dev, replace Electron's default.
+  if (!app.isPackaged && process.platform === 'darwin') app.dock?.setIcon(join(__dirname, '../../build/icon.png'))
   registerIpc()
   createWindow()
   app.on('activate', () => {

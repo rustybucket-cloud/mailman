@@ -1,3 +1,5 @@
+<img src="build/icon.png" alt="" width="128" align="right">
+
 # Mailman
 
 Mailman is a desktop app that drafts release notes from your GitHub history with Claude Code. You review and edit the draft, then Mailman delivers it as a pull request. Merging the PR approves the notes.
