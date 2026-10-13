@@ -27,7 +27,7 @@ Past releases are the previous versions of the notes file in git, after the PM's
 ## Getting started
 
 ```sh
-git clone <this repo> mailman && cd mailman
+git clone https://github.com/rustybucket-cloud/mailman.git && cd mailman
 npm install
 npm run dev
 ```

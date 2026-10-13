@@ -6,6 +6,8 @@
   "main": "./out/main/index.js",
   "author": "Jacob Patton",
   "license": "MIT",
+  "repository": "github:rustybucket-cloud/mailman",
+  "homepage": "https://github.com/rustybucket-cloud/mailman",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
