@@ -139,8 +139,7 @@ type DraftBase = Omit<Parameters<typeof runDraft>[0], 'prompt' | 'resume'>
 async function fitToLimit(draft: Draft, limit: number, base: DraftBase): Promise<Draft> {
   if (charCount(draft.notes) <= limit) return draft
   base.onProgress?.({ activity: 'Shortening to fit the limit…' })
-  const retry = await runDraft({ ...base, prompt: buildTooLongFollowup(draft.notes, limit), resume: draft.sessionId })
-  return { ...retry, costUsd: sumCost(draft.costUsd, retry.costUsd) }
+  return runDraft({ ...base, prompt: buildTooLongFollowup(draft.notes, limit), resume: draft.sessionId })
 }
 
 export function generate(req: GenerateRequest, onProgress: (p: DraftProgress) => void): Promise<Draft> {
@@ -180,8 +179,4 @@ export async function openPr(req: OpenPrRequest): Promise<{ url: string }> {
     body: buildPrBody(req.notes, req.reviewerNote, req.commits)
   })
   return { url }
-}
-
-function sumCost(a: number | null, b: number | null): number | null {
-  return a === null && b === null ? null : (a ?? 0) + (b ?? 0)
 }

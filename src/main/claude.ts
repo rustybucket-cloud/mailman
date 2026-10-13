@@ -114,9 +114,6 @@ export interface DraftOptions {
   onProgress?(p: DraftProgress): void
 }
 
-/** Running cost per session; the SDK reports cumulative totals, and callers want per-call cost. */
-const sessionTotals = new Map<string, number>()
-
 export async function runDraft(opts: DraftOptions): Promise<Draft> {
   const abortController = new AbortController()
   opts.signal?.addEventListener('abort', () => abortController.abort())
@@ -177,7 +174,7 @@ export async function runDraft(opts: DraftOptions): Promise<Draft> {
           if (activity) progress({ activity })
         }
       } else if (msg.type === 'result') {
-        return toDraft(msg, opts.resume)
+        return toDraft(msg)
       }
     }
   } catch (err) {
@@ -187,11 +184,7 @@ export async function runDraft(opts: DraftOptions): Promise<Draft> {
   throw new Error('Claude finished without returning a draft.')
 }
 
-function toDraft(msg: Extract<SDKMessage, { type: 'result' }>, resumed?: string): Draft {
-  const previous = sessionTotals.get(msg.session_id) ?? (resumed ? undefined : 0)
-  sessionTotals.set(msg.session_id, msg.total_cost_usd)
-  const costUsd = previous === undefined ? null : msg.total_cost_usd - previous
-
+function toDraft(msg: Extract<SDKMessage, { type: 'result' }>): Draft {
   if (msg.subtype !== 'success') {
     const reasons: Record<string, string> = {
       error_max_turns: 'Claude used too many steps without finishing.',
@@ -205,7 +198,6 @@ function toDraft(msg: Extract<SDKMessage, { type: 'result' }>, resumed?: string)
   return {
     notes: stripLeakedMarkup(out.notes),
     reviewerNote: stripLeakedMarkup(out.reviewerNote ?? ''),
-    costUsd,
     sessionId: msg.session_id
   }
 }

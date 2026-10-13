@@ -19,7 +19,6 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
   const [notes, setNotes] = useState('')
   const [reviewerNote, setReviewerNote] = useState('')
   const [instruction, setInstruction] = useState('')
-  const [cost, setCost] = useState(0)
   const [busy, setBusy] = useState<Busy>(null)
   const [error, setError] = useState<string | null>(null)
   const [prUrl, setPrUrl] = useState<string | null>(null)
@@ -62,7 +61,6 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
     setNotes(draft.notes)
     setReviewerNote(draft.reviewerNote)
     setSessionId(draft.sessionId)
-    setCost((c) => c + (draft.costUsd ?? 0))
   }
 
   const generate = () =>
@@ -142,7 +140,7 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
                   </button>
                 </span>
               ) : (
-                <span className="faint">{cost > 0 ? `Estimated cost $${cost.toFixed(2)}` : ''}</span>
+                <span />
               )}
               <span className={`count${over ? ' over' : ''}`}>
                 {count} / {config.maxLength}

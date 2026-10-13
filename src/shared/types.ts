@@ -73,8 +73,6 @@ export interface ScanResult {
 export interface Draft {
   notes: string
   reviewerNote: string
-  /** Cost of this call alone, in USD. */
-  costUsd: number | null
   /** Agent SDK session, resumed by refine so Claude keeps its context. */
   sessionId: string
 }
