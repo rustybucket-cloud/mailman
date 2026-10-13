@@ -9,7 +9,7 @@ It runs on the tools you already have: your signed-in [GitHub CLI](https://cli.g
 1. **Finds the last release.** By default that's the last commit that changed the notes file on your release branch. If the file has no history yet, Mailman uses the most recent tag. You can also enter any tag, branch, or SHA.
 2. **Collects what changed.** It lists every commit since that point, with the merged PR's title, description, and labels. Untick anything you want left out.
 3. **Drafts with Claude.** Claude gets the changes, your audience and style guide, and recent past releases. When a change's description is too vague, it reads the PR or commit diff through two read-only GitHub tools. The draft streams into the editor as Claude writes it, and you can cancel at any point. If the result is over the character limit, Claude shortens it. It also explains what it left out.
-4. **You edit.** Change the text directly, or ask for revisions like "shorter" or "lead with the camera fix." Revisions continue the same Claude session, so Claude still has the diffs it read and its earlier reasoning.
+4. **You edit.** Change the text directly, or ask for revisions like "shorter" or "lead with the camera fix." Revisions continue the same Claude session, so Claude still has the diffs it read and its earlier reasoning. Unsent notes are saved as a draft on your computer, along with the changes you picked, so you can switch repos or quit and pick up later. Repos with a draft are marked in the sidebar.
 5. **Delivers a PR.** Mailman creates a branch that updates the notes file and opens a pull request. Anyone can still edit the wording in the PR. Merging it approves the notes and becomes the boundary for the next release.
 
 ### It learns your PM's style

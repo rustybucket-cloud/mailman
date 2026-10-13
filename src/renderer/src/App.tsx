@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { EnvStatus } from '@shared/types'
 import { Sidebar } from './components/Sidebar'
 import { RepoView } from './components/RepoView'
@@ -8,6 +8,7 @@ export function App() {
   const [env, setEnv] = useState<EnvStatus | null>(null)
   const [repos, setRepos] = useState<string[] | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
+  const [drafted, setDrafted] = useState<Set<string>>(new Set())
 
   const recheck = () => void window.mailman.env.check().then(setEnv)
 
@@ -17,10 +18,22 @@ export function App() {
       setRepos(list)
       setSelected((s) => s ?? list[0] ?? null)
     })
+    void window.mailman.drafts.list().then((list) => setDrafted(new Set(list)))
+  }, [])
+
+  const onDraftChange = useCallback((slug: string, saved: boolean) => {
+    setDrafted((prev) => {
+      if (prev.has(slug) === saved) return prev
+      const next = new Set(prev)
+      if (saved) next.add(slug)
+      else next.delete(slug)
+      return next
+    })
   }, [])
 
   function onReposChange(list: string[], added?: string) {
     setRepos(list)
+    setDrafted((prev) => new Set([...prev].filter((slug) => list.includes(slug)))) // removing a repo deletes its draft
     if (added) setSelected(added)
     else if (selected && !list.includes(selected)) setSelected(list[0] ?? null)
   }
@@ -32,6 +45,7 @@ export function App() {
       <Sidebar
         env={env}
         repos={repos ?? []}
+        drafted={drafted}
         selected={selected}
         onSelect={setSelected}
         onReposChange={onReposChange}
@@ -42,7 +56,7 @@ export function App() {
         ) : !ready ? (
           <Setup env={env} onRecheck={recheck} />
         ) : selected ? (
-          <RepoView key={selected} slug={selected} />
+          <RepoView key={selected} slug={selected} onDraftChange={onDraftChange} />
         ) : (
           <div className="center drag">
             <div className="center-card">

@@ -65,6 +65,10 @@ function registerIpc(): void {
   ipcMain.handle('repo:load', (_e, slug: string) => release.loadRepo(slug))
   ipcMain.handle('repo:saveConfig', (_e, slug, config) => release.saveConfig(slug, config))
   ipcMain.handle('repo:resetConfig', (_e, slug: string) => release.resetConfig(slug))
+  ipcMain.handle('drafts:list', () => store.listDrafts())
+  ipcMain.handle('drafts:get', (_e, slug: string) => store.getDraft(slug))
+  ipcMain.handle('drafts:save', (_e, slug: string, draft) => store.setDraft(slug, draft))
+  ipcMain.handle('drafts:discard', (_e, slug: string) => store.setDraft(slug, null))
   ipcMain.handle('release:scan', (_e, slug, config, sinceRef) => release.scan(slug, config, sinceRef))
   ipcMain.handle('release:generate', (e, req) =>
     release.generate(req, (p) => e.sender.send('release:progress', p))

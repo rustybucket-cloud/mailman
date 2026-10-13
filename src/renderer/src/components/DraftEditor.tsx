@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
-import type { Commit, Draft, PastRelease, RepoConfig } from '@shared/types'
+import type { Commit, Draft, PastRelease, RepoConfig, SavedDraft } from '@shared/types'
 import { charCount, errorMessage, pluralize } from '../util'
 import { Postmark } from './Postmark'
+
+/** The part of a saved draft the editor owns. */
+export type EditorDraft = Pick<SavedDraft, 'notes' | 'reviewerNote' | 'sessionId'>
 
 interface Props {
   slug: string
@@ -11,19 +14,23 @@ interface Props {
   branch: string
   /** False while the changes are still loading. */
   ready: boolean
+  /** Saved draft to pick up from. */
+  initial: EditorDraft | null
+  /** Reports the draft to save, or null when there's nothing left to save. */
+  onChange(draft: EditorDraft | null): void
 }
 
 type Busy = 'generate' | 'refine' | 'send' | null
 
-export function DraftEditor({ slug, config, commits, history, branch, ready }: Props) {
-  const [notes, setNotes] = useState('')
-  const [reviewerNote, setReviewerNote] = useState('')
+export function DraftEditor({ slug, config, commits, history, branch, ready, initial, onChange }: Props) {
+  const [notes, setNotes] = useState(initial?.notes ?? '')
+  const [reviewerNote, setReviewerNote] = useState(initial?.reviewerNote ?? '')
   const [instruction, setInstruction] = useState('')
   const [busy, setBusy] = useState<Busy>(null)
   const [error, setError] = useState<string | null>(null)
   const [prUrl, setPrUrl] = useState<string | null>(null)
   const [sentAt, setSentAt] = useState<Date | null>(null)
-  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(initial?.sessionId ?? null)
   const [activity, setActivity] = useState<string | null>(null)
 
   const writing = busy === 'generate' || busy === 'refine'
@@ -40,6 +47,12 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
       if (p.activity) setActivity(p.activity)
     })
   }, [writing])
+
+  // Unsent notes are kept as a draft. Half-written ones aren't saved; a sent one is done.
+  useEffect(() => {
+    if (writing) return
+    onChange(sent || !notes.trim() ? null : { notes, reviewerNote, sessionId })
+  }, [notes, reviewerNote, sessionId, writing, sent, onChange])
 
   async function act(kind: Exclude<Busy, null>, fn: () => Promise<void>) {
     setBusy(kind)
@@ -93,6 +106,10 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
     setError(null)
   }
 
+  function discard() {
+    if (confirm('Discard this draft? The notes will be deleted.')) startOver()
+  }
+
   const prNumber = prUrl?.match(/\/pull\/(\d+)/)?.[1]
   const fileName = config.notesPath.split('/').pop()
 
@@ -140,7 +157,7 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
                   </button>
                 </span>
               ) : (
-                <span />
+                <span className="faint">{sent ? '' : 'Saved as a draft'}</span>
               )}
               <span className={`count${over ? ' over' : ''}`}>
                 {count} / {config.maxLength}
@@ -196,6 +213,9 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
             Opens a pull request that updates <code>{fileName}</code>. Merging it approves the notes.
           </p>
           <div className="right">
+            <button className="btn quiet" onClick={discard} disabled={!!busy}>
+              Discard
+            </button>
             <button className="btn quiet" onClick={() => void generate()} disabled={!!busy || !commits.length}>
               Rewrite
             </button>

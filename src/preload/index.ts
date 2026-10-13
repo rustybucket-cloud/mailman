@@ -13,6 +13,12 @@ const api: MailmanApi = {
     saveConfig: (slug, config) => ipcRenderer.invoke('repo:saveConfig', slug, config),
     resetConfig: (slug) => ipcRenderer.invoke('repo:resetConfig', slug)
   },
+  drafts: {
+    list: () => ipcRenderer.invoke('drafts:list'),
+    get: (slug) => ipcRenderer.invoke('drafts:get', slug),
+    save: (slug, draft) => ipcRenderer.invoke('drafts:save', slug, draft),
+    discard: (slug) => ipcRenderer.invoke('drafts:discard', slug)
+  },
   release: {
     scan: (slug, config, sinceRef) => ipcRenderer.invoke('release:scan', slug, config, sinceRef),
     generate: (req) => ipcRenderer.invoke('release:generate', req),

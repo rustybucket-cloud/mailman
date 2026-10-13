@@ -6,12 +6,14 @@ import { CloseIcon, EnvelopeIcon, PlusIcon } from './icons'
 interface Props {
   env: EnvStatus | null
   repos: string[]
+  /** Repos with an unsent draft. */
+  drafted: Set<string>
   selected: string | null
   onSelect(slug: string): void
   onReposChange(list: string[], added?: string): void
 }
 
-export function Sidebar({ env, repos, selected, onSelect, onReposChange }: Props) {
+export function Sidebar({ env, repos, drafted, selected, onSelect, onReposChange }: Props) {
   const [adding, setAdding] = useState(false)
 
   async function remove(slug: string) {
@@ -35,7 +37,10 @@ export function Sidebar({ env, repos, selected, onSelect, onReposChange }: Props
             <li key={slug} className={`repo-item${slug === selected ? ' active' : ''}`}>
               <button className="repo" onClick={() => onSelect(slug)} title={slug}>
                 <span className="repo-name">{name}</span>
-                <span className="repo-owner">{owner}</span>
+                <span className="repo-owner">
+                  {owner}
+                  {drafted.has(slug) && <span className="repo-draft"> · Draft</span>}
+                </span>
               </button>
               <button className="icon-btn remove" onClick={() => void remove(slug)} aria-label={`Remove ${slug}`}>
                 <CloseIcon />

@@ -77,6 +77,19 @@ export interface Draft {
   sessionId: string
 }
 
+/** Unsent notes, saved on this computer so the user can come back to them. */
+export interface SavedDraft {
+  notes: string
+  reviewerNote: string
+  /** Agent SDK session, so revisions keep Claude's context after a restart. */
+  sessionId: string | null
+  /** Starting point the user chose, or null for the last release. */
+  sinceRef: string | null
+  /** Commits the user left out. */
+  excluded: string[]
+  updatedAt: string
+}
+
 /** Live updates while a draft is being written. */
 export interface DraftProgress {
   /** The notes so far, as Claude writes them. */
@@ -132,6 +145,13 @@ export interface MailmanApi {
     load(slug: string): Promise<RepoState>
     saveConfig(slug: string, config: RepoConfig): Promise<RepoState>
     resetConfig(slug: string): Promise<RepoState>
+  }
+  drafts: {
+    /** Slugs of repos with a saved draft. */
+    list(): Promise<string[]>
+    get(slug: string): Promise<SavedDraft | null>
+    save(slug: string, draft: SavedDraft): Promise<void>
+    discard(slug: string): Promise<void>
   }
   release: {
     scan(slug: string, config: RepoConfig, sinceRef?: string): Promise<ScanResult>
