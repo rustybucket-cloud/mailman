@@ -230,8 +230,8 @@ input::placeholder, textarea::placeholder { color: var(--faint); }
 .note-body { flex: 1; color: var(--graphite); }
 .note-body strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
 
-.revise { display: flex; gap: 8px; }
-.revise input { height: 34px; }
+.revise { display: flex; align-items: flex-end; gap: 8px; }
+.revise textarea { resize: vertical; min-height: 34px; line-height: 1.45; }
 .revise .btn { height: 34px; }
 
 .actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 8px; border-top: 1px solid var(--rule); }

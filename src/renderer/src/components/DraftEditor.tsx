@@ -171,9 +171,17 @@ export function DraftEditor({ slug, config, commits, history, branch, ready }: P
             if (instruction.trim()) void refine()
           }}
         >
-          <input
+          <textarea
+            rows={3}
             value={instruction}
             onChange={(e) => setInstruction(e.target.value)}
+            onKeyDown={(e) => {
+              // Enter sends; Shift+Enter adds a line.
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault()
+                e.currentTarget.form?.requestSubmit()
+              }
+            }}
             placeholder="Ask for changes, like “shorter” or “lead with the camera fix”"
             disabled={!!busy}
             aria-label="Ask Claude for changes"
